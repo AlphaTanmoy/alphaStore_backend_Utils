@@ -1,5 +1,7 @@
 package com.AlphaStore.Utils.ipmonitor
 
+import com.alphaStore.Core.contracts.ClientDeviceRepoAggregatorContract
+import com.alphaStore.Core.entity.GenericLogs
 import com.alphaStore.Core.enums.ApiTire
 import com.alphaStore.Core.enums.HttpMethod
 import org.springframework.stereotype.Component
