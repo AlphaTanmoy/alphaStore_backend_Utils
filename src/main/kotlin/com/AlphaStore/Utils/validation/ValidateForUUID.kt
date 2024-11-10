@@ -3,9 +3,26 @@ package com.alphaStore.Utils.validation
 import com.alphaStore.Utils.KeywordsAndConstants
 import com.alphaStore.Utils.contracts.BadRequestException
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 class ValidateForUUID {
+
+    companion object {
+        fun check(potentialId: String, paramName: String = "", customErrorMessage: String? = null): Boolean {
+            try {
+                UUID.fromString(potentialId)
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                val paramPostFix = if (paramName == "") "" else " "
+                val errorMessageToShow = customErrorMessage ?: run {
+                    "Please provide a valid ${paramName}${paramPostFix}id"
+                }
+                throw BadRequestException(errorMessageToShow)
+            }
+            return true
+        }
+    }
 
     fun validate(passwordString: String, throwExceptionIfFailed: Boolean = true): Boolean {
         var valid = true

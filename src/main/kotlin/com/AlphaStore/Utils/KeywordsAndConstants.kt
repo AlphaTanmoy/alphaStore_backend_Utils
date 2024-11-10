@@ -81,14 +81,17 @@ object KeywordsAndConstants {
     const val HEADER_REQUESTING_IP = "requestingIp"
 
     const val NON_AUTH_APIS = "/country"
-    const val apisTireTen=""
-    const val apisTireNine=""
-    const val apisTireEight=""
-    const val apisTireSeven=""
-    const val apisTireSix=""
-    const val apisTireFive=""
-    const val apisTireFour=""
-    const val apisTireThree=""
-    const val apisTireTwo=""
-    const val apisTireOne="all"
+    const val APIS_TIRE_TEN=""
+    const val APIS_TIRE_NINE=""
+    const val APIS_TIRE_EIGHT=""
+    const val APIS_TIRE_SEVEN=""
+    const val APIS_TIRE_SIX=""
+    const val APIS_TIRE_FIVE=""
+    const val APIS_TIRE_FOUR=""
+    const val APIS_TIRE_THREE=""
+    const val APIS_TIRE_TWO=""
+    const val APIS_TIRE_ONE="all"
+    
+    const val DEFAULT_PAGE_SIZE = 10
+    const val MAX_PAGE_SIZE = 100
 }
