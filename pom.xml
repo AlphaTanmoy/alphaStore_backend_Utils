@@ -13,23 +13,11 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Utils</name>
 	<description>Utils</description>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
 	<properties>
 		<java.version>17</java.version>
 		<kotlin.version>1.9.25</kotlin.version>
 		<spring-cloud.version>2023.0.3</spring-cloud.version>
+		<custom-lib-core.version>0.0.1-SNAPSHOT</custom-lib-core.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -142,5 +130,11 @@
 			</plugin>
 		</plugins>
 	</build>
-
+	<distributionManagement>
+		<repository>
+			<id>alphaStore_backend_Utils</id>
+			<name>Utils</name>
+			<url>https://maven.pkg.github.com/AlphaTanmoy/alphaStore_backend_Utils</url>
+		</repository>
+	</distributionManagement>
 </project>
