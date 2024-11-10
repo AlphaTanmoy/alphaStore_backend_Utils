@@ -2,6 +2,9 @@ package com.alphaStore.Utils
 
 object KeywordsAndConstants {
 
+    const val MICRO_SERVICE_USER_NAME = "alphaStore"
+    const val MICRO_SERVICE_USER_PASSWORD = "alphaStorePassword"
+
     const val POSTGRES_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSSSSS"
     const val DATE_TIME_FORMAT_FOR_FRONTEND = "yyyy-MM-dd'T'HH:mm"
     const val DATE_TIME_FORMAT_FOR_EMAIL = "dd MMM YYYY HH:mm"
@@ -32,11 +35,27 @@ object KeywordsAndConstants {
     const val GENERIC_JWT_CHOICE_THREE =
         "ALfbJ5066FtVE6vz0lUKqe49hx75Qur3z645L9tZpBeOxhq2u0IfiNaQjakRENeVyra69Fm4ftfba4HX"
 
-    const val JWT_TIMEOUT_MINUTES_NORMAL = 50
-    const val REFRESH_TIMEOUT_MINUTES_LONG = 300
+    const val REFRESH_TIMEOUT_MINUTES_SHORT = 100
+    const val REFRESH_TIMEOUT_MINUTES_NORMAL= 300
+    const val REFRESH_TIMEOUT_MINUTES_LONG = 432000
 
-    const val TOKEN_TIRE_ONE = "link-auth"
-    const val REFRESH_TOKEN_SUB = "link-auth-refresh"
+    const val JWT_TIME_OUT_MINUTES_SHORT = 20
+    const val JWT_TIME_OUT_MINUTES_NORMAL = 50
+    const val JWT_TIME_OUT_MINUTES_LONG = 50
+
+    const val TOKEN_TIRE_ONE = "alphaStore"
+    const val REFRESH_TOKEN_SUB = "alphaStore-refresh"
+    const val TOKEN_TIRE_TWO = "alphaStore-soft-token-tire-two"
+    const val TOKEN_TIRE_THREE = "alphaStore-soft-token-tire-three"
+    const val TOKEN_TIRE_FOUR = "alphaStore-soft-token-tire-four"
+    const val TOKEN_TIRE_FIVE = "alphaStore-soft-token-tire-five"
+    const val TOKEN_TIRE_SIX = "alphaStore-soft-token-tire-six"
+    const val TOKEN_TIRE_SEVEN = "alphaStore-soft-token-tire-seven"
+    const val TOKEN_TIRE_EIGHT = "alphaStore-soft-token-tire-eight"
+    const val TOKEN_TIRE_NINE = "alphaStore-soft-token-tire-nine"
+    const val TOKEN_TIRE_TEN = "alphaStore-soft-token-tire-ten"
+    const val MAX_RETRY_FOR_FAILED_REQUEST = 5
+
 
     const val TOKEN_EXPIRED_DESCRIPTION = "token is expired"
     const val TOKEN_NOT_VALID_DESCRIPTION = "token is not valid"
@@ -53,5 +72,23 @@ object KeywordsAndConstants {
     const val ENCRYPTION_PASSWORD_SALT_CHOICE = "18237012"
     const val LENGTH_FOR_ENCRYPTION_KEY = 80
 
+    const val HEADER_AUTH_TOKEN = "authToken"
+    const val HEADER_API_KEY = "apiKey"
+    const val HEADER_APIS_ACCESS_LOG_ID = "apisAccessLogsId"
+    const val HEADER_CHALLENGE_RESULT = "challengeResult"
+    const val HEADER_OTP = "otp"
+    const val HEADER_TRACKING_ID = "trackingId"
+    const val HEADER_REQUESTING_IP = "requestingIp"
 
+    const val NON_AUTH_APIS = "/country"
+    const val apisTireTen=""
+    const val apisTireNine=""
+    const val apisTireEight=""
+    const val apisTireSeven=""
+    const val apisTireSix=""
+    const val apisTireFive=""
+    const val apisTireFour=""
+    const val apisTireThree=""
+    const val apisTireTwo=""
+    const val apisTireOne="all"
 }
