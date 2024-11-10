@@ -1,10 +1,15 @@
 package com.alphaStore.Utils.jwtUtilMaster
 
 import com.alphaStore.Core.entity.AccessRole
+import com.alphaStore.Core.entity.ClientDevice
+import com.alphaStore.Core.enums.TokenType
 import com.alphaStore.Core.enums.UserType
 import com.alphaStore.Core.errormessagereqres.BadRequestExceptionThrowable
 import com.alphaStore.Core.errormessagereqres.UnAuthorizedExceptionThrowable
+import com.alphaStore.Core.model.SoftTokenResponse
 import com.alphaStore.Core.model.TokenCreationResponse
+import com.alphaStore.Core.repoAggregator.AccessRoleRepoAggregator
+import com.alphaStore.Core.repoAggregator.ClientDeviceRepoAggregator
 import com.alphaStore.Utils.KeywordsAndConstants
 import com.alphaStore.Utils.contracts.BadRequestException
 import com.alphaStore.Utils.dateUtil.DateUtil
@@ -25,15 +30,16 @@ import java.util.*
 
 @Component
 class JwtUtilMaster(
-    //private val accessRoleRepoAggregator: AccessRoleRepoAggregator,
-    //private val userRepoAggregator: UserRepoAggregator,
+    private val accessRoleRepoAggregator: AccessRoleRepoAggregator,
+    private val clientDeviceRepoAggregatorContract: ClientDeviceRepoAggregator,
 ) {
 
     fun prepareJWT(
         accessRole: AccessRole,
         id: String,
         userType: UserType,
-        softTokenResponse: String?,
+        softTokenResponse: SoftTokenResponse,
+        clientDevice: ClientDevice,
         trackingId: String? = null
     ): TokenCreationResponse {
         val finalTrackingId = trackingId ?: UUID.randomUUID().toString()
@@ -43,23 +49,80 @@ class JwtUtilMaster(
             )
             val calNow = ZonedDateTime.now()
             val cal = ZonedDateTime.now().plusMinutes(
-                KeywordsAndConstants.JWT_TIMEOUT_MINUTES_NORMAL.toLong()
+                if (
+                    softTokenResponse.tokenType == TokenType.SOFT_TOKEN_TIRE_TEN ||
+                    softTokenResponse.tokenType == TokenType.SOFT_TOKEN_TIRE_NINE ||
+                    softTokenResponse.tokenType == TokenType.SOFT_TOKEN_TIRE_EIGHT ||
+                    softTokenResponse.tokenType == TokenType.SOFT_TOKEN_TIRE_SEVEN ||
+                    softTokenResponse.tokenType == TokenType.SOFT_TOKEN_TIRE_SIX ||
+                    softTokenResponse.tokenType == TokenType.SOFT_TOKEN_TIRE_FIVE ||
+                    softTokenResponse.tokenType == TokenType.SOFT_TOKEN_TIRE_FOUR ||
+                    softTokenResponse.tokenType == TokenType.SOFT_TOKEN_TIRE_THREE ||
+                    softTokenResponse.tokenType == TokenType.SOFT_TOKEN_TIRE_TWO
+                )
+                    KeywordsAndConstants.JWT_TIME_OUT_MINUTES_SHORT.toLong()
+                else if (
+                    clientDevice.trusted
+                )
+                    KeywordsAndConstants.JWT_TIME_OUT_MINUTES_LONG.toLong()
+                else
+                    KeywordsAndConstants.JWT_TIME_OUT_MINUTES_NORMAL.toLong()
             )
             val date = DateUtil.getDateFromZonedDateTime(cal)
             val token = Jwts
                 .builder()
                 .subject(
-                    KeywordsAndConstants.TOKEN_TIRE_ONE
+                    when (softTokenResponse.tokenType) {
+                        TokenType.JWT_SUB -> {
+                            KeywordsAndConstants.TOKEN_TIRE_ONE
+                        }
+
+                        TokenType.SOFT_TOKEN_TIRE_TWO -> {
+                            KeywordsAndConstants.TOKEN_TIRE_TWO
+                        }
+
+                        TokenType.SOFT_TOKEN_TIRE_THREE -> {
+                            KeywordsAndConstants.TOKEN_TIRE_THREE
+                        }
+
+                        TokenType.SOFT_TOKEN_TIRE_FOUR -> {
+                            KeywordsAndConstants.TOKEN_TIRE_FOUR
+                        }
+
+                        TokenType.SOFT_TOKEN_TIRE_FIVE -> {
+                            KeywordsAndConstants.TOKEN_TIRE_FIVE
+                        }
+
+                        TokenType.SOFT_TOKEN_TIRE_SIX -> {
+                            KeywordsAndConstants.TOKEN_TIRE_SIX
+                        }
+
+                        TokenType.SOFT_TOKEN_TIRE_SEVEN -> {
+                            KeywordsAndConstants.TOKEN_TIRE_SEVEN
+                        }
+
+                        TokenType.SOFT_TOKEN_TIRE_EIGHT -> {
+                            KeywordsAndConstants.TOKEN_TIRE_EIGHT
+                        }
+
+                        TokenType.SOFT_TOKEN_TIRE_NINE -> {
+                            KeywordsAndConstants.TOKEN_TIRE_NINE
+                        }
+
+                        TokenType.SOFT_TOKEN_TIRE_TEN -> {
+                            KeywordsAndConstants.TOKEN_TIRE_TEN
+                        }
+                    }
                 )
-                //.claim("role", accessRole.id)
                 .claim("id", id)
                 .claim("type", userType.name)
+                .claim("clientDeviceId", clientDevice.id)
                 .claim("trackingId", finalTrackingId)
                 .claim(
                     "createdAt",
                     EncodingUtil.encode(
                         EncryptionMaster.encrypt(
-                            DateUtil.getStringFromZonedDateTimeUsingIsoDateFormat(calNow),
+                            DateUtil.getStringFromZonedDateTimeUsingIsoDateFormat(calNow)
                         )
                     )
                 )
@@ -67,7 +130,7 @@ class JwtUtilMaster(
                     "expAt",
                     EncodingUtil.encode(
                         EncryptionMaster.encrypt(
-                            DateUtil.getStringFromZonedDateTimeUsingIsoDateFormat(cal),
+                            DateUtil.getStringFromZonedDateTimeUsingIsoDateFormat(cal)
                         )
                     )
                 )
@@ -77,16 +140,33 @@ class JwtUtilMaster(
                 )
                 .compact()
             val calRefresh = ZonedDateTime.now().plusMinutes(
-                KeywordsAndConstants.REFRESH_TIMEOUT_MINUTES_LONG.toLong()
+                if (
+                    softTokenResponse.tokenType == TokenType.SOFT_TOKEN_TIRE_TEN ||
+                    softTokenResponse.tokenType == TokenType.SOFT_TOKEN_TIRE_NINE ||
+                    softTokenResponse.tokenType == TokenType.SOFT_TOKEN_TIRE_EIGHT ||
+                    softTokenResponse.tokenType == TokenType.SOFT_TOKEN_TIRE_SEVEN ||
+                    softTokenResponse.tokenType == TokenType.SOFT_TOKEN_TIRE_SIX ||
+                    softTokenResponse.tokenType == TokenType.SOFT_TOKEN_TIRE_FIVE ||
+                    softTokenResponse.tokenType == TokenType.SOFT_TOKEN_TIRE_FOUR ||
+                    softTokenResponse.tokenType == TokenType.SOFT_TOKEN_TIRE_THREE ||
+                    softTokenResponse.tokenType == TokenType.SOFT_TOKEN_TIRE_TWO
+                )
+                    KeywordsAndConstants.REFRESH_TIMEOUT_MINUTES_SHORT.toLong()
+                else if (
+                    clientDevice.trusted
+                )
+                    KeywordsAndConstants.REFRESH_TIMEOUT_MINUTES_LONG.toLong()
+                else
+                    KeywordsAndConstants.REFRESH_TIMEOUT_MINUTES_NORMAL.toLong()
             )
             val dateRefresh = DateUtil.getDateFromZonedDateTime(calRefresh)
             val refreshToken = Jwts
                 .builder()
                 .subject(KeywordsAndConstants.REFRESH_TOKEN_SUB)
-                //.claim("role", accessRole.id)
                 .claim("id", id)
                 .claim("for", token)
                 .claim("type", userType.name)
+                .claim("clientDeviceId", clientDevice.id)
                 .claim("trackingId", finalTrackingId)
                 .claim(
                     "createdAt",
@@ -184,35 +264,46 @@ class JwtUtilMaster(
         }
     }
 
-    /*fun getAccessRoleFromToken(
+    fun getAccessRoleFromToken(
         token: String,
         throwErrorIfNotFound: Boolean = false
     ): Optional<AccessRole> {
         val optionalBody = getBody(
-            token.replace(KeywordsAndConstants.TOKEN_PREFIX, ""),
+            token.replace(KeywordsAndConstants.TOKEN_PREFIX, "")
         )
         return if (optionalBody.isPresent) {
             val body: Claims = optionalBody.get()
             val accessRoleId = body["role"]
             val accessRoleFromDB = accessRoleRepoAggregator.findByIdAndDataStatus(
                 "$accessRoleId",
-            )
-            if (throwErrorIfNotFound && accessRoleFromDB.isEmpty()) {
+
+                )
+            if (throwErrorIfNotFound && accessRoleFromDB.data.isEmpty()) {
                 throw BadRequestException("Access role not found")
             }
-            if (accessRoleFromDB.isEmpty()) {
+            if (accessRoleFromDB.data.isEmpty()) {
                 return Optional.empty()
             } else {
-                Optional.of(accessRoleFromDB[0])
+                Optional.of(accessRoleFromDB.data[0])
             }
+            /*
+            this is not working for inner items. need to check wit redis for it to work.
+             */
+            /* if (redisObjectMaster.checkIfPresentAccessRole(accessRoleId.toString())) {
+                 Optional.of(redisObjectMaster.getObjectAccessRole(accessRoleId.toString()))
+             } else {
+                 val accessRoleFromDB = accessRoleRepoAggregator.findByIdAndDataStatus("$accessRoleId")
+                 redisObjectMaster.saveAccessRole(accessRoleFromDB[0], accessRoleId.toString())
+                 Optional.of(accessRoleFromDB[0])
+             }*/
         } else {
             Optional.empty()
         }
-    }*/
+    }
 
     fun getUserType(token: String): Optional<UserType> {
         val bodyOptional = getBody(
-            token.replace(KeywordsAndConstants.TOKEN_PREFIX, ""),
+            token.replace(KeywordsAndConstants.TOKEN_PREFIX, "")
         )
         return if (bodyOptional.isPresent) {
             val type = bodyOptional.get()["type"]
@@ -224,7 +315,7 @@ class JwtUtilMaster(
 
     fun getTrackingId(token: String): String {
         val bodyOptional = getBody(
-            token.replace(KeywordsAndConstants.TOKEN_PREFIX, ""),
+            token.replace(KeywordsAndConstants.TOKEN_PREFIX, "")
         )
         return if (bodyOptional.isPresent) {
             val trackingId = bodyOptional.get()["trackingId"]
@@ -246,28 +337,142 @@ class JwtUtilMaster(
         }
     }
 
-    /*fun getUserFromToken(token: String, throwErrorIfNotFound: Boolean = true): Optional<User> {
+    fun getAccessRoleId(token: String): Optional<String> {
         val bodyOptional = getBody(
             token.replace(KeywordsAndConstants.TOKEN_PREFIX, ""),
         )
         return if (bodyOptional.isPresent) {
             val id = bodyOptional.get()["id"]
-            val toReturn = userRepoAggregator.findByIdAndDataStatus(
+            Optional.of(id.toString())
+        } else {
+            Optional.empty()
+        }
+    }
+
+    fun getApplicationGroupCode(token: String): Optional<String> {
+        val bodyOptional = getBody(
+            token.replace(KeywordsAndConstants.TOKEN_PREFIX, "")
+        )
+        return if (bodyOptional.isPresent) {
+            val id = bodyOptional.get()["application_group_code"]
+            Optional.of(id.toString())
+        } else {
+            Optional.empty()
+        }
+    }
+
+    fun getApplicationGroupName(token: String): Optional<String> {
+        val bodyOptional = getBody(
+            token.replace(KeywordsAndConstants.TOKEN_PREFIX, "")
+        )
+        return if (bodyOptional.isPresent) {
+            val id = bodyOptional.get()["application_group_name"]
+            Optional.of(id.toString())
+        } else {
+            Optional.empty()
+        }
+    }
+
+    fun getCountryId(token: String): Optional<String> {
+        val bodyOptional = getBody(
+            token.replace(KeywordsAndConstants.TOKEN_PREFIX, "")
+        )
+        return if (bodyOptional.isPresent) {
+            val id = bodyOptional.get()["country_id"]
+            Optional.of(id.toString())
+        } else {
+            Optional.empty()
+        }
+    }
+
+    fun getCountryName(token: String): Optional<String> {
+        val bodyOptional = getBody(
+            token.replace(KeywordsAndConstants.TOKEN_PREFIX, "")
+        )
+        return if (bodyOptional.isPresent) {
+            val name = bodyOptional.get()["known_name"].toString()
+            Optional.of(name)
+        } else {
+            Optional.empty()
+        }
+    }
+
+    /*fun getCountryType(token: String): Optional<CountryName> {
+        val bodyOptional = getBody(
+            token.replace(KeywordsAndConstants.tokenPrefix, "")
+        )
+        return if (bodyOptional.isPresent) {
+            val type = bodyOptional.get()["type"]
+            Optional.of(UserType.valueOf(type.toString()))
+        } else {
+            Optional.empty()
+        }
+    }*/
+
+
+    /*fun getUserFromToken(
+        token: String,
+        throwErrorIfNotFound: Boolean = true,
+        throwErrorIfNotEligibleForDataModification: Boolean = false
+    ): Optional<User> {
+        val bodyOptional = getBody(
+            token.replace(KeywordsAndConstants.TOKEN_PREFIX, "")
+        )
+        return if (bodyOptional.isPresent) {
+            val id = bodyOptional.get()["id"]
+            val toReturn = userRepoAggregatorContract.findByIdAndDataStatus(
                 id = id.toString(),
-            )
-            if (throwErrorIfNotFound && toReturn.isEmpty()) {
+
+                )
+            if (throwErrorIfNotFound && toReturn.data.isEmpty()) {
                 throw BadRequestException("User not found")
             }
-            if (toReturn.isEmpty()) {
+            if (throwErrorIfNotEligibleForDataModification && !toReturn.data[0].isPropagable) {
+                throw throw ForbiddenException("You can not create application")
+            }
+            if (toReturn.data.isEmpty()) {
                 return Optional.empty()
             } else {
-                Optional.of(toReturn[0])
+                Optional.of(toReturn.data[0])
             }
         } else {
             Optional.empty()
         }
     }*/
 
+
+    fun getClientDeviceFromToken(token: String): Optional<ClientDevice> {
+
+        val bodyOptional = getBody(
+            token.replace(KeywordsAndConstants.TOKEN_PREFIX, "")
+        )
+        return if (bodyOptional.isPresent) {
+            val clientDeviceId = bodyOptional.get()["clientDeviceId"]
+            val toReturn = clientDeviceRepoAggregatorContract.findByIdAndDataStatus(
+                deviceId = clientDeviceId.toString(),
+            )
+            if (toReturn.data.isEmpty()) {
+                throw BadRequestException("Client device not found")
+            }
+            Optional.of(toReturn.data[0])
+        } else {
+            Optional.empty()
+        }
+    }
+
+    fun mayGetClientDeviceId(token: String): String? {
+        if (token == "")
+            return null
+        val bodyOptional = getBody(
+            token.replace(KeywordsAndConstants.TOKEN_PREFIX, "")
+        )
+        return if (bodyOptional.isPresent) {
+            val clientDeviceId = bodyOptional.get()["clientDeviceId"]
+            clientDeviceId.toString()
+        } else {
+            null
+        }
+    }
 
     fun getExpDate(token: String): Optional<ZonedDateTime> {
         try {
@@ -286,7 +491,7 @@ class JwtUtilMaster(
                 return Optional.of(expDateOpt.get())
             } else {
                 val body: HashMap<String, String> = getBodyFromJwtIgnoringExpiryDate(
-                    token.replace(KeywordsAndConstants.TOKEN_PREFIX, ""),
+                    token.replace(KeywordsAndConstants.TOKEN_PREFIX, "")
                 )
                 val expAt = EncryptionMaster.decrypt(EncodingUtil.decode(body["expAt"].toString()))
                 val expDateOpt =
@@ -356,7 +561,7 @@ class JwtUtilMaster(
     fun getJwtAuth(serverWebExchange: ServerWebExchange, mustReturnTokenOrElseCrash: Boolean = false): String? {
         var header = serverWebExchange.request.headers.getFirst(HttpHeaders.AUTHORIZATION)
         header?.let {
-            KeywordsAndConstants.NO_AUTH_APIS.split(",").forEach { api ->
+            KeywordsAndConstants.NON_AUTH_APIS.split(",").forEach { api ->
                 if (serverWebExchange.request.uri.toString().contains(api, ignoreCase = true)) {
                     return null
                 }
