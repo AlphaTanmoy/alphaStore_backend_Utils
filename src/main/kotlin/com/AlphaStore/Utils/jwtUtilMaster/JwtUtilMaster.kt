@@ -9,6 +9,7 @@ import com.alphaStore.Core.errormessagereqres.UnAuthorizedExceptionThrowable
 import com.alphaStore.Core.model.SoftTokenResponse
 import com.alphaStore.Core.model.TokenCreationResponse
 import com.alphaStore.Core.repoAggregator.AccessRoleRepoAggregator
+import com.alphaStore.Core.repoAggregator.ClientDeviceRepoAggregator
 import com.alphaStore.Utils.KeywordsAndConstants
 import com.alphaStore.Utils.contracts.BadRequestException
 import com.alphaStore.Utils.dateUtil.DateUtil
@@ -30,7 +31,6 @@ import java.util.*
 @Component
 class JwtUtilMaster(
     private val accessRoleRepoAggregator: AccessRoleRepoAggregator,
-    //private val userRepoAggregatorContract: UserRepoAggregatorContract,
     private val clientDeviceRepoAggregatorContract: ClientDeviceRepoAggregator,
 ) {
 
